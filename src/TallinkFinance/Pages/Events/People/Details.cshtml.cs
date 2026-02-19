@@ -31,8 +31,7 @@ public class DetailsModel : PageModel
     public decimal ParticipatedTotal => ParticipantExpenses.Sum(expense => expense.ShareAmount);
     public decimal OwesTotal => OwesRows.Sum(debt => debt.Amount);
     public decimal IsOwedTotal => IsOwedRows.Sum(debt => debt.Amount);
-    public decimal SettlementNet => IsOwedTotal - OwesTotal;
-    public decimal Net => SettlementNet - PaidTotal;
+    public decimal Net => IsOwedTotal - OwesTotal;
 
     public async Task<IActionResult> OnGetAsync(int eventId, int personId)
     {

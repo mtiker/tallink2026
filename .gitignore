@@ -1,0 +1,19 @@
+# Build outputs
+**/bin/
+**/obj/
+**/bin_temp/
+artifacts/
+
+# User/IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Logs
+*.log
+
+# Local database/runtime files
+*.db
+*.db-shm
+*.db-wal

@@ -48,23 +48,11 @@ public class IndexModel : PageModel
             .Select(person => new { person.Id, person.Name })
             .ToDictionaryAsync(item => item.Id, item => item.Name);
 
-        var paidTotals = await _context.Expenses
-            .AsNoTracking()
-            .Where(expense => expense.EventId == eventId)
-            .GroupBy(expense => expense.PaidByPersonId)
-            .Select(group => new
-            {
-                PersonId = group.Key,
-                Total = group.Sum(expense => expense.Amount)
-            })
-            .ToDictionaryAsync(item => item.PersonId, item => item.Total);
-
         Rows = (await _balances.GetBalancesAsync(eventId, includePayments))
             .Select(balance => new BalanceRow
             {
                 PersonId = balance.PersonId,
                 PersonName = people.GetValueOrDefault(balance.PersonId, "Unknown"),
-                PaidTotal = paidTotals.GetValueOrDefault(balance.PersonId, 0m),
                 OwesTotal = balance.OwesTotal,
                 IsOwedTotal = balance.IsOwedTotal
             })
@@ -86,10 +74,8 @@ public class IndexModel : PageModel
     {
         public int PersonId { get; init; }
         public string PersonName { get; init; } = string.Empty;
-        public decimal PaidTotal { get; init; }
         public decimal OwesTotal { get; init; }
         public decimal IsOwedTotal { get; init; }
-        public decimal SettlementNet => IsOwedTotal - OwesTotal;
-        public decimal Net => SettlementNet - PaidTotal;
+        public decimal Net => IsOwedTotal - OwesTotal;
     }
 }

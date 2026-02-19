@@ -114,7 +114,6 @@ public class IndexModel : PageModel
         public decimal ParticipatedTotal { get; set; }
         public decimal OwesTotal { get; set; }
         public decimal IsOwedTotal { get; set; }
-        public decimal SettlementNet => IsOwedTotal - OwesTotal;
-        public decimal Net => SettlementNet - PaidTotal;
+        public decimal Net => IsOwedTotal - OwesTotal;
     }
 }

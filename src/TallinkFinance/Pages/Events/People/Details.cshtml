@@ -53,8 +53,7 @@ else
                 <div class="card-body">
                     <div class="text-muted small">Is Owed</div>
                     <div class="h5 mb-0">@Model.IsOwedTotal.ToString("0.00") @Model.EventItem.Currency</div>
-                    <div class="small mt-1">Settlement net: @Model.SettlementNet.ToString("0.00")</div>
-                    <div class="small fw-semibold">Net (incl. paid -): @Model.Net.ToString("0.00")</div>
+                    <div class="small fw-semibold mt-1">Net: @Model.Net.ToString("0.00")</div>
                 </div>
             </div>
         </div>
