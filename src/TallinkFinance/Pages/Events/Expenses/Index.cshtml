@@ -1,0 +1,110 @@
+@page "/Events/{eventId:int}/Expenses"
+@model TallinkFinance.Pages.Events.Expenses.IndexModel
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+@if (Model.EventItem is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">Expenses - @Model.EventItem.Name</h1>
+            <div class="text-muted">Grouped by day</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
+            <a class="btn btn-primary" asp-page="/Events/Expenses/Create" asp-route-eventId="@Model.EventItem.Id">Add Expense</a>
+        </div>
+    </div>
+
+    <form method="get" class="card shadow-sm mb-3">
+        <div class="card-body">
+            <input type="hidden" name="eventId" value="@Model.EventItem.Id" />
+            <div class="row g-3">
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="dateFrom">From</label>
+                    <input id="dateFrom" name="dateFrom" type="date" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="dateTo">To</label>
+                    <input id="dateTo" name="dateTo" type="date" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="payerId">Payer</label>
+                    <select id="payerId" name="payerId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var option in Model.PayerOptions)
+                        {
+                            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="search">Search</label>
+                    <input id="search" name="search" value="@Model.Search" class="form-control" placeholder="title or category" />
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a class="btn btn-outline-secondary" asp-page="/Events/Expenses/Index" asp-route-eventId="@Model.EventItem.Id">Reset</a>
+        </div>
+    </form>
+
+    @if (Model.Expenses.Any())
+    {
+        @foreach (var group in Model.Expenses.GroupBy(expense => expense.Date.Date).OrderByDescending(group => group.Key))
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <strong>@group.Key.ToString("yyyy-MM-dd")</strong>
+                    <span class="text-muted">
+                        @group.Sum(item => item.Amount).ToString("0.00") @Model.EventItem.Currency
+                    </span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Payer</th>
+                            <th class="text-end">Participants</th>
+                            <th class="text-end">Amount</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var expense in group)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@expense.Title</td>
+                                <td>@(string.IsNullOrWhiteSpace(expense.Category) ? "-" : expense.Category)</td>
+                                <td>@expense.PayerName</td>
+                                <td class="text-end">@expense.ParticipantCount</td>
+                                <td class="text-end">@expense.Amount.ToString("0.00") @Model.EventItem.Currency</td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-outline-primary"
+                                       asp-page="/Events/Expenses/Details"
+                                       asp-route-eventId="@Model.EventItem.Id"
+                                       asp-route-expenseId="@expense.Id">
+                                        Details
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info">No expenses found for the selected filters.</div>
+    }
+}

@@ -1,0 +1,135 @@
+@page "/Events/{id:int}"
+@model TallinkFinance.Pages.Events.DetailsModel
+@{
+    ViewData["Title"] = "Event Dashboard";
+}
+
+@if (Model.Dashboard is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">@Model.Dashboard.Name</h1>
+            <div class="text-muted">
+                @Model.Dashboard.StartDate.ToString("yyyy-MM-dd")
+                @if (Model.Dashboard.EndDate.HasValue)
+                {
+                    <span>to @Model.Dashboard.EndDate.Value.ToString("yyyy-MM-dd")</span>
+                }
+                <span class="ms-2">(@Model.Dashboard.Currency)</span>
+            </div>
+        </div>
+        <a class="btn btn-outline-secondary" asp-page="/Events/Index">All Events</a>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">People</div>
+                    <div class="h4 mb-0">@Model.Dashboard.PeopleCount</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Expenses</div>
+                    <div class="h4 mb-0">@Model.Dashboard.ExpenseTotal.ToString("0.00") @Model.Dashboard.Currency</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Payments</div>
+                    <div class="h4 mb-0">@Model.Dashboard.PaymentTotal.ToString("0.00") @Model.Dashboard.Currency</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Entries</div>
+                    <div class="h6 mb-0">@Model.Dashboard.ExpenseCount expenses / @Model.Dashboard.PaymentCount payments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="btn btn-outline-primary" asp-page="/Events/People/Index" asp-route-eventId="@Model.Dashboard.Id">People</a>
+        <a class="btn btn-outline-primary" asp-page="/Events/Expenses/Index" asp-route-eventId="@Model.Dashboard.Id">Expenses</a>
+        <a class="btn btn-outline-primary" asp-page="/Events/Payments/Index" asp-route-eventId="@Model.Dashboard.Id">Payments</a>
+        <a class="btn btn-outline-primary" asp-page="/Events/Balances/Index" asp-route-eventId="@Model.Dashboard.Id">Balances</a>
+        <a class="btn btn-outline-primary" asp-page="/Events/Debts/Index" asp-route-eventId="@Model.Dashboard.Id">Debts</a>
+        <a class="btn btn-outline-primary" asp-page="/Events/Daily/Index" asp-route-eventId="@Model.Dashboard.Id">Daily View</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0">Recent Expenses</h2>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Events/Expenses/Index" asp-route-eventId="@Model.Dashboard.Id">See All</a>
+                    </div>
+                    @if (Model.RecentExpenses.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var expense in Model.RecentExpenses)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <div class="fw-semibold">@expense.Title</div>
+                                        <div class="text-muted small">@expense.Date.ToString("yyyy-MM-dd") by @expense.PaidByName</div>
+                                    </div>
+                                    <a class="btn btn-sm btn-outline-secondary" asp-page="/Events/Expenses/Details" asp-route-eventId="@Model.Dashboard.Id" asp-route-expenseId="@expense.Id">
+                                        @expense.Amount.ToString("0.00") @Model.Dashboard.Currency
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No expenses yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h2 class="h5 mb-0">Recent Payments</h2>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Events/Payments/Index" asp-route-eventId="@Model.Dashboard.Id">See All</a>
+                    </div>
+                    @if (Model.RecentPayments.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var payment in Model.RecentPayments)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <div class="fw-semibold">@payment.FromName -> @payment.ToName</div>
+                                        <div class="text-muted small">@payment.Date.ToString("yyyy-MM-dd")</div>
+                                    </div>
+                                    <span>@payment.Amount.ToString("0.00") @Model.Dashboard.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No payments yet.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

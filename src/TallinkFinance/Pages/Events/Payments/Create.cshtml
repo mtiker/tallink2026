@@ -1,0 +1,80 @@
+@page "/Events/{eventId:int}/Payments/Add"
+@model TallinkFinance.Pages.Events.Payments.CreateModel
+@{
+    ViewData["Title"] = "Add Payment";
+}
+
+@if (Model.EventItem is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else if (Model.PersonOptions.Count < 2)
+{
+    <div class="alert alert-warning">
+        You need at least two people in this event before adding payments.
+        <a class="alert-link" asp-page="/Events/People/Create" asp-route-eventId="@Model.EventItem.Id">Add person</a>
+    </div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Add Payment - @Model.EventItem.Name</h1>
+        <a class="btn btn-outline-secondary" asp-page="/Events/Payments/Index" asp-route-eventId="@Model.EventItem.Id">Back to Payments</a>
+    </div>
+
+    <form method="post" class="card shadow-sm">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label asp-for="Input.FromPersonId" class="form-label">From</label>
+                    <select asp-for="Input.FromPersonId" class="form-select">
+                        @foreach (var person in Model.PersonOptions)
+                        {
+                            <option value="@person.Id">@person.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.FromPersonId" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label asp-for="Input.ToPersonId" class="form-label">To</label>
+                    <select asp-for="Input.ToPersonId" class="form-select">
+                        @foreach (var person in Model.PersonOptions)
+                        {
+                            <option value="@person.Id">@person.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Input.ToPersonId" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="Input.Amount" class="form-label"></label>
+                    <input asp-for="Input.Amount" type="number" step="0.01" min="0.01" class="form-control" />
+                    <span asp-validation-for="Input.Amount" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="Input.Date" class="form-label"></label>
+                    <input asp-for="Input.Date" type="date" class="form-control" />
+                    <span asp-validation-for="Input.Date" class="text-danger"></span>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label asp-for="Input.Note" class="form-label"></label>
+                    <input asp-for="Input.Note" class="form-control" />
+                    <span asp-validation-for="Input.Note" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save Payment</button>
+            <a class="btn btn-outline-secondary" asp-page="/Events/Payments/Index" asp-route-eventId="@Model.EventItem.Id">Cancel</a>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

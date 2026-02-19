@@ -1,0 +1,86 @@
+@page "/Events/{eventId:int}/Payments"
+@model TallinkFinance.Pages.Events.Payments.IndexModel
+@{
+    ViewData["Title"] = "Payments";
+}
+
+@if (Model.EventItem is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">Payments - @Model.EventItem.Name</h1>
+            <div class="text-muted">Settlement log</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
+            <a class="btn btn-primary" asp-page="/Events/Payments/Create" asp-route-eventId="@Model.EventItem.Id">Add Payment</a>
+        </div>
+    </div>
+
+    <form method="get" class="card shadow-sm mb-3">
+        <div class="card-body">
+            <input type="hidden" name="eventId" value="@Model.EventItem.Id" />
+            <div class="row g-3">
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="dateFrom">From</label>
+                    <input id="dateFrom" name="dateFrom" type="date" value="@Model.DateFrom?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="dateTo">To</label>
+                    <input id="dateTo" name="dateTo" type="date" value="@Model.DateTo?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-12 col-md-3">
+                    <label class="form-label" for="personId">Person</label>
+                    <select id="personId" name="personId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var option in Model.PeopleOptions)
+                        {
+                            <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a class="btn btn-outline-secondary" asp-page="/Events/Payments/Index" asp-route-eventId="@Model.EventItem.Id">Reset</a>
+        </div>
+    </form>
+
+    @if (Model.Payments.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th class="text-end">Amount</th>
+                    <th>Note</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var payment in Model.Payments)
+                {
+                    <tr>
+                        <td>@payment.Date.ToString("yyyy-MM-dd")</td>
+                        <td>@payment.FromName</td>
+                        <td>@payment.ToName</td>
+                        <td class="text-end">@payment.Amount.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td>@(string.IsNullOrWhiteSpace(payment.Note) ? "-" : payment.Note)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">No payments found for the selected filters.</div>
+    }
+}

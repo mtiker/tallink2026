@@ -1,0 +1,41 @@
+@page "/Events/{eventId:int}/People/Add"
+@model TallinkFinance.Pages.Events.People.CreateModel
+@{
+    ViewData["Title"] = "Add Person";
+}
+
+@if (Model.EventItem is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else
+{
+    <h1 class="h3 mb-3">Add Person - @Model.EventItem.Name</h1>
+
+    <form method="post" class="card shadow-sm">
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label asp-for="PersonInput.Name" class="form-label"></label>
+                    <input asp-for="PersonInput.Name" class="form-control" />
+                    <span asp-validation-for="PersonInput.Name" class="text-danger"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="PersonInput.Contact" class="form-label"></label>
+                    <input asp-for="PersonInput.Contact" class="form-control" />
+                    <span asp-validation-for="PersonInput.Contact" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a class="btn btn-outline-secondary" asp-page="/Events/People/Index" asp-route-eventId="@Model.EventItem.Id">Cancel</a>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

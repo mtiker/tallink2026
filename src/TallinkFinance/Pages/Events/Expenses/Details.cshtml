@@ -1,0 +1,109 @@
+@page "/Events/{eventId:int}/Expenses/{expenseId:int}"
+@model TallinkFinance.Pages.Events.Expenses.DetailsModel
+@{
+    ViewData["Title"] = "Expense Details";
+}
+
+@if (Model.EventItem is null || Model.ExpenseItem is null)
+{
+    <div class="alert alert-warning">Expense not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">@Model.ExpenseItem.Title</h1>
+            <div class="text-muted">
+                @Model.ExpenseItem.Date.ToString("yyyy-MM-dd") | Paid by @Model.ExpenseItem.PaidByName
+                @if (!string.IsNullOrWhiteSpace(Model.ExpenseItem.Category))
+                {
+                    <span>| @Model.ExpenseItem.Category</span>
+                }
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Events/Expenses/Index" asp-route-eventId="@Model.EventItem.Id">Expenses</a>
+            <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <div class="text-muted small">Total Amount</div>
+                <div class="h4 mb-0">@Model.ExpenseItem.Amount.ToString("0.00") @Model.EventItem.Currency</div>
+            </div>
+            <div class="text-end">
+                <div class="text-muted small">Participants</div>
+                <div class="h5 mb-0">@Model.Shares.Count</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Shares</h2>
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Person</th>
+                            <th class="text-end">Share</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var share in Model.Shares)
+                        {
+                            <tr>
+                                <td>@share.PersonName</td>
+                                <td class="text-end">@share.ShareAmount.ToString("0.00") @Model.EventItem.Currency</td>
+                            </tr>
+                        }
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <th class="text-end">@Model.Shares.Sum(item => item.ShareAmount).ToString("0.00") @Model.EventItem.Currency</th>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Debts Created by This Expense</h2>
+                    @if (Model.DerivedDebts.Any())
+                    {
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th>Debtor</th>
+                                <th>Creditor</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var debt in Model.DerivedDebts)
+                            {
+                                <tr>
+                                    <td>@debt.DebtorName</td>
+                                    <td>@debt.CreditorName</td>
+                                    <td class="text-end">@debt.Amount.ToString("0.00") @Model.EventItem.Currency</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No debts created (payer covered only their own share).</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

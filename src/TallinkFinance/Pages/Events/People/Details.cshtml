@@ -1,0 +1,221 @@
+@page "/Events/{eventId:int}/People/{personId:int}"
+@model TallinkFinance.Pages.Events.People.DetailsModel
+@{
+    ViewData["Title"] = "Person Details";
+}
+
+@if (Model.EventItem is null || Model.PersonItem is null)
+{
+    <div class="alert alert-warning">Record not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">@Model.PersonItem.Name</h1>
+            <div class="text-muted">
+                @(string.IsNullOrWhiteSpace(Model.PersonItem.Contact) ? "No contact info" : Model.PersonItem.Contact)
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Events/People/Index" asp-route-eventId="@Model.EventItem.Id">People</a>
+            <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Paid</div>
+                    <div class="h5 mb-0">@Model.PaidTotal.ToString("0.00") @Model.EventItem.Currency</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Participated</div>
+                    <div class="h5 mb-0">@Model.ParticipatedTotal.ToString("0.00") @Model.EventItem.Currency</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Owes</div>
+                    <div class="h5 mb-0">@Model.OwesTotal.ToString("0.00") @Model.EventItem.Currency</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Is Owed</div>
+                    <div class="h5 mb-0">@Model.IsOwedTotal.ToString("0.00") @Model.EventItem.Currency</div>
+                    <div class="small mt-1">Settlement net: @Model.SettlementNet.ToString("0.00")</div>
+                    <div class="small fw-semibold">Net (incl. paid -): @Model.Net.ToString("0.00")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Paid Expenses</h2>
+                    @if (Model.PaidExpenses.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.PaidExpenses)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <a asp-page="/Events/Expenses/Details" asp-route-eventId="@Model.EventItem.Id" asp-route-expenseId="@item.ExpenseId">
+                                        @item.Title
+                                    </a>
+                                    <span>@item.Amount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No paid expenses.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Participated Expenses</h2>
+                    @if (Model.ParticipantExpenses.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var item in Model.ParticipantExpenses)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <div>
+                                        <a asp-page="/Events/Expenses/Details" asp-route-eventId="@Model.EventItem.Id" asp-route-expenseId="@item.ExpenseId">
+                                            @item.Title
+                                        </a>
+                                        <div class="small text-muted">Paid by @item.PaidByName</div>
+                                    </div>
+                                    <span>@item.ShareAmount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No participation records.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Debts (You Owe)</h2>
+                    @if (Model.OwesRows.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var debt in Model.OwesRows)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>@debt.OtherPersonName</span>
+                                    <span>@debt.Amount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No outstanding debts.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Debts (Others Owe You)</h2>
+                    @if (Model.IsOwedRows.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var debt in Model.IsOwedRows)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span>@debt.OtherPersonName</span>
+                                    <span>@debt.Amount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Nobody owes this person right now.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Outgoing Payments</h2>
+                    @if (Model.OutgoingPayments.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var payment in Model.OutgoingPayments)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <div>
+                                        <div>@payment.OtherPersonName</div>
+                                        <div class="small text-muted">@payment.Date.ToString("yyyy-MM-dd") @(string.IsNullOrWhiteSpace(payment.Note) ? "" : $"- {payment.Note}")</div>
+                                    </div>
+                                    <span>@payment.Amount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No outgoing payments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h2 class="h5">Incoming Payments</h2>
+                    @if (Model.IncomingPayments.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+                            @foreach (var payment in Model.IncomingPayments)
+                            {
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <div>
+                                        <div>@payment.OtherPersonName</div>
+                                        <div class="small text-muted">@payment.Date.ToString("yyyy-MM-dd") @(string.IsNullOrWhiteSpace(payment.Note) ? "" : $"- {payment.Note}")</div>
+                                    </div>
+                                    <span>@payment.Amount.ToString("0.00") @Model.EventItem.Currency</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">No incoming payments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

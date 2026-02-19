@@ -1,0 +1,25 @@
+html {
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+body {
+  min-height: 100vh;
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.table > :not(caption) > * > * {
+  vertical-align: middle;
+}
+
+.form-check-input {
+  cursor: pointer;
+}

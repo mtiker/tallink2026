@@ -1,0 +1,66 @@
+@page "/Events/{eventId:int}/People"
+@model TallinkFinance.Pages.Events.People.IndexModel
+@{
+    ViewData["Title"] = "People";
+}
+
+@if (Model.EventItem is null)
+{
+    <div class="alert alert-warning">Event not found.</div>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0">People - @Model.EventItem.Name</h1>
+            <div class="text-muted">@Model.EventItem.Currency</div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
+            <a class="btn btn-primary" asp-page="/Events/People/Create" asp-route-eventId="@Model.EventItem.Id">Add Person</a>
+        </div>
+    </div>
+
+    @if (Model.People.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th class="text-end">Paid</th>
+                    <th class="text-end">Participated</th>
+                    <th class="text-end">Owes</th>
+                    <th class="text-end">Is Owed</th>
+                    <th class="text-end">Net (incl. Paid -)</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var person in Model.People)
+                {
+                    <tr>
+                        <td class="fw-semibold">@person.Name</td>
+                        <td>@(string.IsNullOrWhiteSpace(person.Contact) ? "-" : person.Contact)</td>
+                        <td class="text-end">@person.PaidTotal.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td class="text-end">@person.ParticipatedTotal.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td class="text-end">@person.OwesTotal.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td class="text-end">@person.IsOwedTotal.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td class="text-end fw-semibold">@person.Net.ToString("0.00") @Model.EventItem.Currency</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary" asp-page="/Events/People/Details" asp-route-eventId="@Model.EventItem.Id" asp-route-personId="@person.Id">
+                                Details
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">No people added yet.</div>
+    }
+}
