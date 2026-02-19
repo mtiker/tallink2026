@@ -13,7 +13,7 @@ else
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="h3 mb-0">Balances - @Model.EventItem.Name</h1>
-            <div class="text-muted">Net = (Is Owed - Owes) - Paid</div>
+            <div class="text-muted">Per person owed / owes / net overview</div>
         </div>
         <a class="btn btn-outline-secondary" asp-page="/Events/Details" asp-route-id="@Model.EventItem.Id">Dashboard</a>
     </div>
@@ -37,10 +37,9 @@ else
                 <thead>
                 <tr>
                     <th>Person</th>
-                    <th class="text-end">Paid</th>
                     <th class="text-end">Owes</th>
                     <th class="text-end">Is Owed</th>
-                    <th class="text-end">Net (incl. Paid -)</th>
+                    <th class="text-end">Net</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -52,7 +51,6 @@ else
                                 @row.PersonName
                             </a>
                         </td>
-                        <td class="text-end">@row.PaidTotal.ToString("0.00") @Model.EventItem.Currency</td>
                         <td class="text-end">@row.OwesTotal.ToString("0.00") @Model.EventItem.Currency</td>
                         <td class="text-end">@row.IsOwedTotal.ToString("0.00") @Model.EventItem.Currency</td>
                         <td class="text-end fw-semibold">@row.Net.ToString("0.00") @Model.EventItem.Currency</td>
@@ -61,8 +59,7 @@ else
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th>Total Net</th>
-                    <th></th>
+                    <th>Control</th>
                     <th></th>
                     <th></th>
                     <th class="text-end">@Model.NetControl.ToString("0.00") @Model.EventItem.Currency</th>
